@@ -1,9 +1,18 @@
+/* eslint-disable import/extensions */
 const router = require('express').Router();
-// eslint-disable-next-line import/extensions
-const { getUsers, getUser } = require('../controllers/users.js');
 
-router.get('/users', getUsers);
+const {
+  getUsers,
+  getUser,
+  createUser,
+  updateProfile,
+  updateAvatar,
+} = require("../controllers/users.js");
 
-router.get('/users/:id', getUser);
+router.get("/users", getUsers);
+router.get("/users/:userIid", getUser);
+router.post("/users", createUser);
+router.patch("/users/me", updateProfile);
+router.patch("/users/me/avatar", updateAvatar);
 
 module.exports = router;
