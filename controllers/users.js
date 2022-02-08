@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 // eslint-disable-next-line import/extensions
 const User = require('../models/user.js');
 // eslint-disable-next-line quotes
@@ -67,4 +68,6 @@ const updateAvatar = (req, res) => {
     });
 };
 
-module.exports = { getUsers, getUser, createUser, updateProfile, updateAvatar };
+module.exports = {
+ getUsers, getUser, createUser, updateProfile, updateAvatar,
+};
