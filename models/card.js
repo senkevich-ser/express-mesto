@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/* const mongoose = require('mongoose');
 
 const CardSchema = new mongoose.Schema({
   name: {
@@ -27,3 +27,4 @@ const CardSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('user', CardSchema);
+ */

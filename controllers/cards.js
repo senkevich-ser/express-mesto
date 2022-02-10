@@ -1,4 +1,4 @@
-const Card = require("../models/card");
+/* const Card = require("../models/card");
 
 const errCatch = (err, res) => {
   console.log(`Ошибка: ${err}`);
@@ -44,9 +44,14 @@ const deleteCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  Card.findByIdAndUpdate(req.params.cardId, {
-    $addToSet: { likes: req.user._id },
-  })
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    {
+      $addToSet: { likes: req.user._id },
+    },
+    // eslint-disable-next-line comma-dangle
+    { new: true }
+  )
     .then((card) => {
       if (!card) {
         res.send("Такой карточки нет!");
@@ -59,7 +64,12 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } })
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    // eslint-disable-next-line comma-dangle
+    { new: true }
+  )
     .then((card) => {
       if (!card) {
         res.send("Такой карточки нет!");
@@ -77,3 +87,4 @@ module.exports = {
   likeCard,
   dislikeCard,
 };
+ */
