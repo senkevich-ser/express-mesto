@@ -1,69 +1,53 @@
-/* const Card = require("../models/card");
+const Card = require("../models/card");
+const NotFoundError = require("../errors/not-found-err");
 
 const errCatch = (err, res) => {
-  console.log(`Ошибка: ${err}`);
   // eslint-disable-next-line quotes
-  res.status(500).send({ message: `Ошибка на сервере:${err}` });
+  res.status(500).send({ message: `Ошибка на сервере`, ...err });
 };
 
-const getCards = (req, res) => {
-  Card.find({})
-    .then((data) => res.status(200).send(data))
-    .catch((err) => {
-      errCatch(err, res);
-    });
+exports.getCards = async (req, res) => {
+  try {
+    const cards = await Card.find({});
+    if (!cards) {
+      res.send("Произошла ошибка при получении данных пользователей");
+    }
+    res.status(200).send(cards);
+  } catch (err) {
+    res.status(500).send({ message: `Ошибка на сервере` });
+  }
 };
 
-const createCard = (req, res) => {
+exports.createCard = (req, res) => {
   const { name, link } = req.body;
-
   Card.create({ name, link, owner: req.user._id })
-    .then((user) => res.status(201).send({ data: user }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       errCatch(err, res);
     });
 };
 
-const deleteCard = (req, res) => {
-  const { id } = req.params;
-
-  Card.findById(id)
-    .then((card) => {
-      if (!card) {
-        res.send("Такой карточки нет!");
-      }
-      if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
-        res.send("Невозможно удалить данную карточку");
-      }
-      return Card.findByIdAndRemove(id);
-    })
-    .then((card) => res.status(200).send({ data: card }))
-    .catch((err) => {
-      errCatch(err, res);
-    });
+exports.deleteCard = async (req, res) => {
+  const deleteCard = await Card.findByIdAndRemove(req.params.cardId);
+  res.status(200).send(`Карточка:${deleteCard} удалена`);
 };
 
-const likeCard = (req, res) => {
+exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {
-      $addToSet: { likes: req.user._id },
-    },
+    { $addToSet: { likes: req.user._id } },
     // eslint-disable-next-line comma-dangle
     { new: true }
   )
     .then((card) => {
       if (!card) {
-        res.send("Такой карточки нет!");
+        throw new NotFoundError("Такой карточки нет!");
       }
-      res.status(201).send({ data: card });
+      res.status(200).send({ data: card });
     })
-    .catch((err) => {
-      errCatch(err, res);
-    });
+    .catch(next);
 };
-
-const dislikeCard = (req, res) => {
+exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -72,19 +56,9 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.send("Такой карточки нет!");
+        throw new NotFoundError("Такой карточки нет!");
       }
-      res.status(201).send({ data: card });
+      res.status(200).send({ data: card });
     })
-    .catch((err) => {
-      errCatch(err, res);
-    });
+    .catch(next);
 };
-module.exports = {
-  getCards,
-  createCard,
-  deleteCard,
-  likeCard,
-  dislikeCard,
-};
- */

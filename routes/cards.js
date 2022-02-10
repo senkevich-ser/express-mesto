@@ -1,5 +1,6 @@
 /* eslint-disable import/extensions */
-const router = require("express").Router();
+const express = require("express");
+const cardRoutes = require("express").Router();
 
 const {
   getCards,
@@ -9,10 +10,10 @@ const {
   dislikeCard,
 } = require("../controllers/cards.js");
 
-router.get("/cards", getCards);
-router.post("/cards", createCard);
-router.delete("/cards/:cardId", deleteCard);
-router.put("/cards/:cardId/likes", likeCard);
-router.delete("/cards/:cardId/likes", dislikeCard);
+cardRoutes.get("/", getCards);
+cardRoutes.post("/", express.json(), createCard);
+cardRoutes.delete("/:cardId", express.json(), deleteCard);
+cardRoutes.put("/:cardId/likes", express.json(), likeCard);
+cardRoutes.delete("/:cardId/likes", express.json(), dislikeCard);
 
-module.exports = router;
+module.exports = cardRoutes;

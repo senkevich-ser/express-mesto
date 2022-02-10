@@ -7,12 +7,17 @@ const errCatch = (err, res) => {
   // eslint-disable-next-line quotes
   res.status(500).send({ message: `Ошибка на сервере:${err}` });
 };
-exports.getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => {
-      errCatch(err, res);
-    });
+// eslint-disable-next-line consistent-return
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (!users) {
+      return res.send("Данные пользователей на сервере не найдены");
+    }
+    res.status(200).send({ data: users });
+  } catch (err) {
+    errCatch(err, res);
+  }
 };
 
 exports.getUserById = async (req, res) => {
@@ -25,9 +30,9 @@ exports.createUser = async (req, res) => {
   res.status(201).send(await user.save());
 };
 
-exports.updateProfile = (req, res) => {
+exports.updateProfile = async (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
+  const updateUser = await User.findByIdAndUpdate(
     req.user._id,
     { name, about },
     {
@@ -36,16 +41,13 @@ exports.updateProfile = (req, res) => {
       upsert: true,
       // eslint-disable-next-line comma-dangle
     }
-  )
-    .then((user) => res.status(202).send({ data: user }))
-    .catch((err) => {
-      errCatch(err, res);
-    });
+  );
+  res.status(202).send({ data: updateUser });
 };
 
-exports.updateAvatar = (req, res) => {
+exports.updateAvatar = async (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(
+  const updateAvatar = await User.findByIdAndUpdate(
     req.user._id,
     { avatar },
     {
@@ -54,9 +56,6 @@ exports.updateAvatar = (req, res) => {
       upsert: true,
       // eslint-disable-next-line comma-dangle
     }
-  )
-    .then((user) => res.status(202).send({ data: user }))
-    .catch((err) => {
-      errCatch(err, res);
-    });
+  );
+  res.status(202).send({ data: updateAvatar });
 };

@@ -2,6 +2,8 @@ const express = require("express");
 // eslint-disable-next-line import/extensions
 const mongoose = require("mongoose");
 // eslint-disable-next-line import/extensions
+const cardRoutes = require("./routes/cards.js");
+// eslint-disable-next-line import/extensions
 const userRoutes = require("./routes/users.js");
 
 const { PORT = 3000 } = process.env;
@@ -18,6 +20,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/users", userRoutes);
+app.use("/cards", cardRoutes);
 
 async function main() {
   await mongoose.connect("mongodb://localhost:27017/mestodb", {
