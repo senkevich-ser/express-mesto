@@ -9,10 +9,11 @@ const {
   NOT_FOUND,
 } = require("../utils/constants");
 
+// eslint-disable-next-line consistent-return
 exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
-    res.status(STATUS_OK).send(cards);
+    return res.status(STATUS_OK).send(cards);
   } catch (err) {
     res.status(ERROR_SERVER).send({ message: `Ошибка на сервере`, ...err });
   }
@@ -25,7 +26,7 @@ exports.createCard = async (req, res) => {
     // eslint-disable-next-line no-constant-condition
     const newCard = await Card.create({ name, link, owner: req.user._id });
     if (newCard) {
-      res.status(STATUS_CREATED).send({ data: newCard });
+      return res.status(STATUS_CREATED).send({ data: newCard });
     }
     throw new BadDataError("Предоставлены не коректные данные");
   } catch (err) {
@@ -65,16 +66,17 @@ exports.likeCard = async (req, res) => {
       { new: true }
     );
     if (card) {
-      res.status(STATUS_OK).send({ data: card });
+      return res.status(STATUS_OK).send({ data: card });
     }
     throw new NotFoundError("Такой карточки нет!");
   } catch (err) {
-    res
+    return res
       .status(NOT_FOUND)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
 };
 
+// eslint-disable-next-line consistent-return
 exports.dislikeCard = async (req, res) => {
   try {
     const card = await Card.findByIdAndUpdate(
@@ -84,7 +86,7 @@ exports.dislikeCard = async (req, res) => {
       { new: true }
     );
     if (card) {
-      res.status(STATUS_OK).send({ data: card });
+      return res.status(STATUS_OK).send({ data: card });
     }
     throw new NotFoundError("Такой карточки нет!");
   } catch (err) {
