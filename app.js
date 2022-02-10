@@ -27,7 +27,7 @@ async function main() {
     useNewUrlParser: true,
   });
   await app.listen(PORT);
-  console.log("this server is started....");
+  console.log(`This server is runing. Connect port is ${PORT} `);
 }
 
 main();

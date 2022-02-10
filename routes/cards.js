@@ -11,7 +11,7 @@ const {
 } = require("../controllers/cards.js");
 
 cardRoutes.get("/", getCards);
-cardRoutes.post("/", express.json(), createCard);
+cardRoutes.post("/", /* express.json(), */ createCard);
 cardRoutes.delete("/:cardId", express.json(), deleteCard);
 cardRoutes.put("/:cardId/likes", express.json(), likeCard);
 cardRoutes.delete("/:cardId/likes", express.json(), dislikeCard);
