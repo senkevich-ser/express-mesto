@@ -1,11 +1,6 @@
 const Card = require("../models/card");
 const NotFoundError = require("../errors/not-found-err");
 
-const errCatch = (err, res) => {
-  // eslint-disable-next-line quotes
-  res.status(500).send({ message: `Ошибка на сервере`, ...err });
-};
-
 exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
@@ -18,13 +13,10 @@ exports.getCards = async (req, res) => {
   }
 };
 
-exports.createCard = (req, res) => {
+exports.createCard = async (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send({ data: card }))
-    .catch((err) => {
-      errCatch(err, res);
-    });
+  const newCard = await Card.create({ name, link, owner: req.user._id });
+  res.status(201).send({ data: newCard });
 };
 
 exports.deleteCard = async (req, res) => {
@@ -32,33 +24,28 @@ exports.deleteCard = async (req, res) => {
   res.status(200).send(`Карточка:${deleteCard} удалена`);
 };
 
-exports.likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
+exports.likeCard = async (req, res) => {
+  const card = await Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     // eslint-disable-next-line comma-dangle
     { new: true }
-  )
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError("Такой карточки нет!");
-      }
-      res.status(200).send({ data: card });
-    })
-    .catch(next);
+  );
+  if (!card) {
+    throw new NotFoundError("Такой карточки нет!");
+  }
+  res.status(200).send({ data: card });
 };
-exports.dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
+
+exports.dislikeCard = async (req, res) => {
+  const card = await Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     // eslint-disable-next-line comma-dangle
     { new: true }
-  )
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError("Такой карточки нет!");
-      }
-      res.status(200).send({ data: card });
-    })
-    .catch(next);
+  );
+  if (!card) {
+    throw new NotFoundError("Такой карточки нет!");
+  }
+  res.status(200).send({ data: card });
 };
