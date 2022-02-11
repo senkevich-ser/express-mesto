@@ -1,17 +1,14 @@
-/* eslint-disable indent */
-// eslint-disable-next-line import/extensions
-const User = require("../models/user.js");
+const User = require("../models/user");
 const NotFoundError = require("../errors/not-found-err");
-const BadDataError = require("../errors/bad-data-err");
 const {
   BAD_REQUEST,
   STATUS_OK,
   STATUS_CREATED,
   ERROR_SERVER,
   NOT_FOUND,
+  STATUS_ACCEPTED,
 } = require("../utils/constants");
 
-// eslint-disable-next-line consistent-return
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -19,8 +16,7 @@ exports.getUsers = async (req, res) => {
       return res.status(STATUS_OK).send({ data: users });
     }
     throw new NotFoundError(
-      // eslint-disable-next-line comma-dangle
-      "Данные пользователей с такими параметрами не найдены"
+      "Данные пользователей с такими параметрами не найдены",
     );
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
@@ -30,29 +26,25 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (user) {
       return res.status(STATUS_OK).send(user);
     }
-    throw new NotFoundError("Пользователь с таким ID не найден");
+    return res.status(NOT_FOUND).send({ message: `данные не найдены` });
   } catch (err) {
-    console.log(err);
-    res
-      .status(NOT_FOUND)
-      .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).send({ message: `Невалидный ID` });
+    }
+    return res.status(ERROR_SERVER).send({ message: `Ошибка сервера` });
   }
 };
 
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    if (user) {
-      return res.status(STATUS_CREATED).send(await user.save());
-    }
-    throw new BadDataError("Предоставлены не коректные данные");
+    return res.status(STATUS_CREATED).send(await user.save());
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
     if (err.name.includes("ValidationError")) {
@@ -62,7 +54,7 @@ exports.createUser = async (req, res) => {
     }
     console.log(`Ошибка на сервере: ${err}`);
     return res
-      .status(BAD_REQUEST)
+      .status(ERROR_SERVER)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
 };
@@ -76,24 +68,21 @@ exports.updateProfile = async (req, res) => {
       {
         new: true,
         runValidators: true,
-        upsert: true,
-        // eslint-disable-next-line comma-dangle
-      }
+      },
     );
     if (updateUser) {
-      return res.status(202).send({ data: updateUser });
+      return res.status(STATUS_ACCEPTED).send({ data: updateUser });
     }
-    throw new BadDataError("Предоставлены не коректные данные");
+    return res.status(NOT_FOUND).send({ message: `Данные не найдены` });
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
-    if (err.name.includes("ValidationError")) {
+    if (err.name === "ValidationError") {
       return res
         .status(BAD_REQUEST)
         .send({ message: `Ошибка валидации данных `, ...err });
     }
-    console.log(`Ошибка на сервере: ${err}`);
     return res
-      .status(BAD_REQUEST)
+      .status(ERROR_SERVER)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
 };
@@ -107,18 +96,21 @@ exports.updateAvatar = async (req, res) => {
       {
         new: true,
         runValidators: true,
-        upsert: true,
-        // eslint-disable-next-line comma-dangle
-      }
+      },
     );
     if (updateAvatar) {
       return res.status(STATUS_OK).send({ data: updateAvatar });
     }
-    throw new BadDataError("Предоставлены не коректные данные");
+    return res.status(NOT_FOUND).send({ message: `Данные не найдены` });
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
+    if (err.name === "ValidationError") {
+      return res
+        .status(BAD_REQUEST)
+        .send({ message: `Ошибка валидации данных `, ...err });
+    }
     return res
-      .status(BAD_REQUEST)
+      .status(ERROR_SERVER)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
 };
