@@ -15,7 +15,10 @@ exports.getCards = async (req, res) => {
     const cards = await Card.find({});
     return res.status(STATUS_OK).send(cards);
   } catch (err) {
-    res.status(ERROR_SERVER).send({ message: `Ошибка на сервере`, ...err });
+    console.log(`Ошибка на сервере: ${err}`);
+    return res
+      .status(ERROR_SERVER)
+      .send({ message: `Ошибка на сервере`, ...err });
   }
 };
 
@@ -30,12 +33,14 @@ exports.createCard = async (req, res) => {
     }
     throw new BadDataError("Предоставлены не коректные данные");
   } catch (err) {
+    console.log(`Ошибка на сервере: ${err}`);
     if (err.name.includes("ValidationError")) {
       return res
         .status(BAD_REQUEST)
         .send({ message: `Ошибка валидации данных `, ...err });
     }
-    res
+    console.log(`Ошибка на сервере: ${err}`);
+    return res
       .status(BAD_REQUEST)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
@@ -48,10 +53,10 @@ exports.deleteCard = async (req, res) => {
     if (deleteCard) {
       return res.status(STATUS_OK).send(`Карточка:${deleteCard} удалена`);
     }
-    throw new NotFoundError("Карточка не найдена");
+    throw new NotFoundError("Карточка с таким ID не найдена");
   } catch (err) {
     console.log(err.message, err.statusCode);
-    res
+    return res
       .status(NOT_FOUND)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
@@ -90,7 +95,7 @@ exports.dislikeCard = async (req, res) => {
     }
     throw new NotFoundError("Такой карточки нет!");
   } catch (err) {
-    res
+    return res
       .status(NOT_FOUND)
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
