@@ -1,6 +1,6 @@
 const User = require("../models/user");
-const bcrypt= require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const NotFoundError = require("../errors/not-found-err");
 const {
   BAD_REQUEST,
@@ -18,7 +18,7 @@ exports.getUsers = async (req, res) => {
       return res.status(STATUS_OK).send({ data: users });
     }
     throw new NotFoundError(
-      "Данные пользователей с такими параметрами не найдены",
+      "Данные пользователей с такими параметрами не найдены"
     );
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
@@ -46,8 +46,8 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    const hash = await bcrypt.hash(user.password,10);
-    user.password= hash;
+    const hash = await bcrypt.hash(user.password, 10);
+    user.password = hash;
     return res.status(STATUS_CREATED).send(await user.save());
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
@@ -72,7 +72,7 @@ exports.updateProfile = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      },
+      }
     );
     if (updateUser) {
       return res.status(STATUS_ACCEPTED).send({ data: updateUser });
@@ -100,7 +100,7 @@ exports.updateAvatar = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      },
+      }
     );
     if (updateAvatar) {
       return res.status(STATUS_OK).send({ data: updateAvatar });
@@ -119,22 +119,21 @@ exports.updateAvatar = async (req, res) => {
   }
 };
 
-
-exports.userLogin =(req,res)=>{
+exports.userLogin = (req, res) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key',{ expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, "some-secret-key", {
+        expiresIn: "7d",
+      });
       res
-  .cookie('jwt', token, {
-    maxAge: 3600000*24*7,
-    httpOnly: true
-  })
-  .end();
+        .cookie("jwt", token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .end();
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
+      res.status(401).send({ message: err.message });
     });
-}
+};
