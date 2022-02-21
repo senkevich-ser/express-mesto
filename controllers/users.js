@@ -1,4 +1,6 @@
 const User = require("../models/user");
+const bcrypt= require('bcrypt');
+const jwt = require('jsonwebtoken');
 const NotFoundError = require("../errors/not-found-err");
 const {
   BAD_REQUEST,
@@ -44,6 +46,8 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
+    const hash = await bcrypt.hash(user.password,10);
+    user.password= hash;
     return res.status(STATUS_CREATED).send(await user.save());
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
@@ -114,3 +118,23 @@ exports.updateAvatar = async (req, res) => {
       .send({ message: `Ошибка сервера:${err.statusCode}  ${err.message}` });
   }
 };
+
+
+exports.userLogin =(req,res)=>{
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key',{ expiresIn: '7d' });
+      res
+  .cookie('jwt', token, {
+    maxAge: 3600000*24*7,
+    httpOnly: true
+  })
+  .end();
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+}
