@@ -1,6 +1,7 @@
-const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
 const NotFoundError = require("../errors/not-found-err");
 const {
   BAD_REQUEST,
@@ -18,13 +19,27 @@ exports.getUsers = async (req, res) => {
       return res.status(STATUS_OK).send({ data: users });
     }
     throw new NotFoundError(
-      "Данные пользователей с такими параметрами не найдены"
+      "Данные пользователей с такими параметрами не найдены",
     );
   } catch (err) {
     console.log(`Ошибка на сервере: ${err}`);
     return res
       .status(ERROR_SERVER)
       .send({ message: `Ошибка на сервере`, ...err });
+  }
+};
+
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      return res.status(STATUS_OK).send({ data: user });
+    } return res.status(NOT_FOUND).send({ message: `данные не найдены` });
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).send({ message: `Невалидный ID` });
+    }
+    return res.status(ERROR_SERVER).send({ message: `Ошибка сервера` });
   }
 };
 
@@ -72,7 +87,7 @@ exports.updateProfile = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     );
     if (updateUser) {
       return res.status(STATUS_ACCEPTED).send({ data: updateUser });
@@ -100,7 +115,7 @@ exports.updateAvatar = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     );
     if (updateAvatar) {
       return res.status(STATUS_OK).send({ data: updateAvatar });
@@ -127,11 +142,7 @@ exports.userLogin = (req, res) => {
         expiresIn: "7d",
       });
       res
-        .cookie("jwt", token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-        })
-        .end();
+        .send({ token });
     })
     .catch((err) => {
       res.status(401).send({ message: err.message });

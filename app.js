@@ -1,10 +1,9 @@
 const express = require("express");
-// eslint-disable-next-line import/extensions
 const mongoose = require("mongoose");
-// eslint-disable-next-line import/extensions
-const cardRoutes = require("./routes/cards.js");
-// eslint-disable-next-line import/extensions
-const userRoutes = require("./routes/users.js");
+const { createUser, userLogin } = require("./controllers/users");
+const cardRoutes = require("./routes/cards");
+const userRoutes = require("./routes/users");
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -12,15 +11,16 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
   req.user = {
     _id: "6203328871133a9946eab130",
   };
   next();
-});
-
-app.use("/users", userRoutes);
-app.use("/cards", cardRoutes);
+}); */
+app.post('/signup', express.json(), createUser);
+app.post('/signin', express.json(), userLogin);
+app.use("/users", auth, userRoutes);
+app.use("/cards", auth, cardRoutes);
 app.use((req, res) => {
   res.status(404).send({ message: "Запрашиваемый ресурс не найден" });
 });
