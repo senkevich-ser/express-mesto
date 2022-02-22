@@ -11,12 +11,6 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-/* app.use((req, res, next) => {
-  req.user = {
-    _id: "6203328871133a9946eab130",
-  };
-  next();
-}); */
 app.post('/signup', express.json(), createUser);
 app.post('/signin', express.json(), userLogin);
 app.use("/users", auth, userRoutes);
