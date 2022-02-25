@@ -24,6 +24,7 @@ exports.createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const newCard = await Card.create({ name, link, owner: req.user._id });
+    console.log(newCard);
     if (!newCard) {
       throw new BadRequestErr("Переданы некорректные данные");
     }
@@ -34,6 +35,7 @@ exports.createCard = async (req, res, next) => {
         .status(BAD_REQUEST)
         .send({ message: `Ошибка валидации данных `, ...err });
     }
+    console.log(err);
     next(err);
   }
 };
