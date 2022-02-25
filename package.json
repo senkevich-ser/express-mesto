@@ -28,6 +28,7 @@
     "bcrypt": "^5.0.1",
     "express": "^4.17.2",
     "jsonwebtoken": "^8.5.1",
+    "lint": "^0.7.0",
     "mongoose": "^6.2.1",
     "validator": "^13.7.0"
   }
