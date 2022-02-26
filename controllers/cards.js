@@ -1,6 +1,5 @@
 const Card = require("../models/card");
 const {
-  BAD_REQUEST,
   STATUS_OK,
   STATUS_CREATED,
 } = require("../utils/constants");
@@ -24,19 +23,16 @@ exports.createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const newCard = await Card.create({ name, link, owner: req.user._id });
-    console.log(newCard);
     if (!newCard) {
       throw new BadRequestErr("Переданы некорректные данные");
     }
     return res.status(STATUS_CREATED).send({ data: newCard });
   } catch (err) {
     if (err.name.includes("ValidationError")) {
-      return res
-        .status(BAD_REQUEST)
-        .send({ message: `Ошибка валидации данных `, ...err });
+      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+    } else {
+      next(err);
     }
-    console.log(err);
-    next(err);
   }
 };
 
@@ -53,12 +49,12 @@ exports.deleteCard = async (req, res, next) => {
     }
     const deleteCard = await Card.findByIdAndRemove(cardId);
     if (deleteCard) {
-      return res.status(STATUS_OK).send(`Карточка:${deleteCard} удалена`);
+      return res.status(STATUS_OK).send({ message: `Карточка: ${deleteCard._id} удалена` });
     }
     throw new NotFoundErr('Данные не найдены');
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: `Невалидный ID` });
+      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
     }
     next(err);
   }
@@ -78,7 +74,7 @@ exports.likeCard = async (req, res, next) => {
     throw new NotFoundErr("Данная карточка не существует");
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: `Невалидный ID` });
+      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
     }
     next(err);
   }
@@ -98,7 +94,7 @@ exports.dislikeCard = async (req, res, next) => {
     throw new NotFoundErr("Данная карточка не существует");
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: `Невалидный ID` });
+      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
     }
     next(err);
   }
