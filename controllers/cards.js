@@ -45,7 +45,7 @@ exports.deleteCard = async (req, res, next) => {
       throw new NotFoundErr("Данная карточка не существует");
     }
     if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
-      throw new ForBiddenErr('Не возможно удалить данную карточку');
+      throw new ForBiddenErr('Вы не можете удалить данную карточку');
     }
     const deleteCard = await Card.findByIdAndRemove(cardId);
     if (deleteCard) {

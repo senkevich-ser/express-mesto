@@ -9,7 +9,7 @@ const UnAutorized = require('../errors/UnAutorizedErr');
 const {
   STATUS_OK,
   STATUS_CREATED,
-  STATUS_ACCEPTED
+  STATUS_ACCEPTED,
 } = require("../utils/constants");
 
 // eslint-disable-next-line consistent-return
@@ -18,7 +18,7 @@ exports.getUsers = async (req, res, next) => {
     const users = await User.find({});
     if (!users) {
       throw new NotFoundErr(
-        "Данные пользователей с такими параметрами не найдены"
+        "Данные пользователей с такими параметрами не найдены",
       );
     }
     return res.status(STATUS_OK).send({ data: users });
@@ -37,13 +37,7 @@ exports.getCurrentUser = async (req, res, next) => {
     return res.status(STATUS_OK).send({ data: user });
   } catch (err) {
     if (err.name === "CastError") {
-      next(
-        new BadRequestErr(
-          `${Object.values(err)
-            .map(error => error)
-            .join(", ")}`
-        )
-      );
+      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
     }
     next(err);
   }
@@ -59,13 +53,7 @@ exports.getUserById = async (req, res, next) => {
     throw new NotFoundErr("Пользователь  не найден");
   } catch (err) {
     if (err.name === "CastError") {
-      next(
-        new BadRequestErr(
-          `${Object.values(err)
-            .map(error => error)
-            .join(", ")}`
-        )
-      );
+      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
     }
     next(err);
   }
@@ -88,13 +76,7 @@ exports.createUser = async (req, res, next) => {
       .send({ _id: user._id, email: user.email });
   } catch (err) {
     if (err.name.includes("ValidationError")) {
-      next(
-        new BadRequestErr(
-          `${Object.values(err.errors)
-            .map(error => error.message)
-            .join(", ")}`
-        )
-      );
+      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
     }
     next(err);
   }
@@ -109,8 +91,8 @@ exports.updateProfile = async (req, res, next) => {
       { name, about },
       {
         new: true,
-        runValidators: true
-      }
+        runValidators: true,
+      },
     );
     if (updateUser) {
       return res.status(STATUS_ACCEPTED).send({ data: updateUser });
@@ -118,13 +100,7 @@ exports.updateProfile = async (req, res, next) => {
     throw new NotFoundErr("Данный пользователь не найден");
   } catch (err) {
     if (err.name === "ValidationError") {
-      next(
-        new BadRequestErr(
-          `${Object.values(err.errors)
-            .map(error => error.message)
-            .join(", ")}`
-        )
-      );
+      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
     }
     next(err);
   }
@@ -139,8 +115,8 @@ exports.updateAvatar = async (req, res, next) => {
       { avatar },
       {
         new: true,
-        runValidators: true
-      }
+        runValidators: true,
+      },
     );
     if (updateAvatar) {
       return res.status(STATUS_OK).send({ data: updateAvatar });
@@ -148,28 +124,22 @@ exports.updateAvatar = async (req, res, next) => {
     throw new NotFoundErr("Данный пользователь не найден");
   } catch (err) {
     if (err.name === "ValidationError") {
-      next(
-        new BadRequestErr(
-          `${Object.values(err.errors)
-            .map(error => error.message)
-            .join(", ")}`
-        )
-      );
+      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
     }
     next(err);
   }
 };
 
-exports.userLogin = (req, res,next) => {
+exports.userLogin = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
-    .then(user => {
+    .then((user) => {
       const token = jwt.sign({ _id: user._id }, "some-secret-key", {
-        expiresIn: "7d"
+        expiresIn: "7d",
       });
       res.send({ token });
     })
     .catch(() => {
       next(new UnAutorized("Данный пользователь не авторизован"));
     });
-}; 
+};

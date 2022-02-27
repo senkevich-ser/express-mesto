@@ -1,5 +1,6 @@
+/* eslint-disable max-len */
 const { celebrate, Joi } = require("celebrate");
-const { ObjectId } = require('mongoose').Types;
+/* const { ObjectId } = require('mongoose').Types; */
 
 const checkUser = celebrate({
   body: Joi.object().keys({
@@ -17,6 +18,7 @@ const checkProfile = celebrate({
 
 const checkAvatar = celebrate({
   body: Joi.object().keys({
+    // eslint-disable-next-line no-useless-escape
     avatar: Joi.string().required().pattern(/https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/),
   }),
 });
@@ -24,18 +26,8 @@ const checkAvatar = celebrate({
 const checkNewCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
+    // eslint-disable-next-line no-useless-escape
     link: Joi.string().required().pattern(/https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/),
-  }),
-});
-
-const validateCardId = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().required().custom((value, helpers) => {
-      if (ObjectId.isValid(value)) {
-        return value;
-      }
-      return helpers.message('Невалидный id');
-    }),
   }),
 });
 
@@ -45,12 +37,10 @@ const checkCardId = celebrate({
   }),
 });
 
-const checkDeletedCardId = celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().alphanum().length(24),
-  }),
-});
-
 module.exports = {
-  checkCardId, checkUser, checkProfile, checkAvatar, checkNewCard, validateCardId, checkDeletedCardId,
+  checkUser,
+  checkProfile,
+  checkAvatar,
+  checkNewCard,
+  checkCardId,
 };
