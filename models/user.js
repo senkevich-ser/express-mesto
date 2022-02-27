@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const isEmail = require("validator/lib/isEmail");
+const isURL = require("validator/lib/isURL");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
@@ -21,23 +22,21 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     default: "Жак-Ив Кусто",
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'В поле name длина не менее 2  символов'],
+    maxlength: [30, 'В поле name длина не более 30 символов'],
   },
   about: {
     type: String,
     default: "Исследователь",
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'В поле about длина не менее 2  символов'],
+    maxlength: [30, 'В поле about длина не более 30 символов'],
   },
   avatar: {
     type: String,
     default: "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
     validate: {
-      validator(v) {
-        // eslint-disable-next-line no-useless-escape
-        return /https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/gi.test(v);
-      },
+      validator: (v) => isURL(v),
+      message: "Неправильный формат URL",
     },
   },
 });

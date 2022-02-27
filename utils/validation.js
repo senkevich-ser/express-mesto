@@ -1,4 +1,5 @@
 const { celebrate, Joi } = require("celebrate");
+const { ObjectId } = require('mongoose').Types;
 
 const checkUser = celebrate({
   body: Joi.object().keys({
@@ -29,7 +30,7 @@ const checkNewCard = celebrate({
 
 const validateCardId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().required().custom((value, helpers) => {
+    cardId: Joi.string().required().custom((value, helpers) => {
       if (ObjectId.isValid(value)) {
         return value;
       }
@@ -38,11 +39,11 @@ const validateCardId = celebrate({
   }),
 });
 
-/* const checkCardId = celebrate({
+const checkCardId = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum().length(24),
   }),
-}); */
+});
 
 const checkDeletedCardId = celebrate({
   params: Joi.object().keys({
@@ -51,5 +52,5 @@ const checkDeletedCardId = celebrate({
 });
 
 module.exports = {
-  checkUser, checkProfile, checkAvatar, checkNewCard, validateCardId, checkDeletedCardId,
+  checkCardId, checkUser, checkProfile, checkAvatar, checkNewCard, validateCardId, checkDeletedCardId,
 };
