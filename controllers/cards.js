@@ -14,11 +14,10 @@ exports.getCards = async (req, res, next) => {
     const cards = await Card.find({});
     return res.status(STATUS_OK).send(cards);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
@@ -29,14 +28,12 @@ exports.createCard = async (req, res, next) => {
     return res.status(STATUS_CREATED).send({ data: newCard });
   } catch (err) {
     if (err.name.includes("ValidationError")) {
-      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-    } else {
-      next(err);
+      return next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
     }
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.deleteCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
@@ -54,13 +51,12 @@ exports.deleteCard = async (req, res, next) => {
     throw new NotFoundErr('Данные не найдены');
   } catch (err) {
     if (err.name === "CastError") {
-      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
+      return next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
@@ -74,13 +70,12 @@ exports.likeCard = async (req, res, next) => {
     throw new NotFoundErr("Данная карточка не существует");
   } catch (err) {
     if (err.name === "CastError") {
-      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
+      return next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
@@ -94,8 +89,8 @@ exports.dislikeCard = async (req, res, next) => {
     throw new NotFoundErr("Данная карточка не существует");
   } catch (err) {
     if (err.name === "CastError") {
-      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
+      return next(new BadRequestErr(`${Object.values(err).map((error) => error).join(', ')}`));
     }
-    next(err);
+    return next(err);
   }
 };

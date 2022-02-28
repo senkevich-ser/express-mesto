@@ -12,7 +12,6 @@ const {
   STATUS_ACCEPTED,
 } = require("../utils/constants");
 
-// eslint-disable-next-line consistent-return
 exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
@@ -23,11 +22,10 @@ exports.getUsers = async (req, res, next) => {
     }
     return res.status(STATUS_OK).send({ data: users });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
@@ -37,13 +35,12 @@ exports.getCurrentUser = async (req, res, next) => {
     return res.status(STATUS_OK).send({ data: user });
   } catch (err) {
     if (err.name === "CastError") {
-      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
+      return next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -53,13 +50,12 @@ exports.getUserById = async (req, res, next) => {
     throw new NotFoundErr("Пользователь  не найден");
   } catch (err) {
     if (err.name === "CastError") {
-      next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
+      return next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.createUser = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -76,13 +72,12 @@ exports.createUser = async (req, res, next) => {
       .send({ _id: user._id, email: user.email });
   } catch (err) {
     if (err.name.includes("ValidationError")) {
-      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
+      return next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.updateProfile = async (req, res, next) => {
   try {
     const { name, about } = req.body;
@@ -100,13 +95,12 @@ exports.updateProfile = async (req, res, next) => {
     throw new NotFoundErr("Данный пользователь не найден");
   } catch (err) {
     if (err.name === "ValidationError") {
-      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
+      return next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
-// eslint-disable-next-line consistent-return
 exports.updateAvatar = async (req, res, next) => {
   try {
     const { avatar } = req.body;
@@ -124,9 +118,9 @@ exports.updateAvatar = async (req, res, next) => {
     throw new NotFoundErr("Данный пользователь не найден");
   } catch (err) {
     if (err.name === "ValidationError") {
-      next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
+      return next(new BadRequestErr(`${Object.values(err.errors).map((error) => error.message).join(", ")}`));
     }
-    next(err);
+    return next(err);
   }
 };
 

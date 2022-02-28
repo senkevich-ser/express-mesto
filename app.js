@@ -12,9 +12,10 @@ const { checkUser } = require('./utils/validation');
 const { PORT = 3000 } = process.env;
 
 const app = express();
+app.use(express.json());
 
-app.post("/signup", express.json(), checkUser, createUser);
-app.post("/signin", express.json(), checkUser, userLogin);
+app.post("/signup", checkUser, createUser);
+app.post("/signin", checkUser, userLogin);
 app.use("/users", auth, userRoutes);
 app.use("/cards", auth, cardRoutes);
 app.use(auth, () => {

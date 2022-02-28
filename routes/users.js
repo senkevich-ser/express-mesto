@@ -1,5 +1,3 @@
-/* eslint-disable import/extensions */
-const express = require("express");
 const userRoutes = require("express").Router();
 const { checkUserId, checkAvatar, checkProfile } = require('../utils/validation');
 
@@ -9,12 +7,12 @@ const {
   updateProfile,
   updateAvatar,
   getCurrentUser,
-} = require("../controllers/users.js");
+} = require("../controllers/users");
 
 userRoutes.get("/", getUsers);
-userRoutes.get("/me", checkUserId, getCurrentUser);
+userRoutes.get("/me", getCurrentUser);
 userRoutes.get("/:id", checkUserId, getUserById);
-userRoutes.patch("/me", express.json(), checkProfile, updateProfile);
-userRoutes.patch("/me/avatar", express.json(), checkAvatar, updateAvatar);
+userRoutes.patch("/me", checkProfile, updateProfile);
+userRoutes.patch("/me/avatar", checkAvatar, updateAvatar);
 
 module.exports = userRoutes;
