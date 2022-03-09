@@ -20,7 +20,7 @@ exports.getUsers = async (req, res, next) => {
         "Данные пользователей с такими параметрами не найдены",
       );
     }
-    return res.status(STATUS_OK).send({ data: users });
+    return res.status(STATUS_OK).send(users);
   } catch (err) {
     return next(err);
   }
@@ -32,7 +32,7 @@ exports.getCurrentUser = async (req, res, next) => {
     if (!user) {
       throw new NotFoundErr("Пользователь не найден");
     }
-    return res.status(STATUS_OK).send({ data: user });
+    return res.status(STATUS_OK).send(user);
   } catch (err) {
     if (err.name === "CastError") {
       return next(new BadRequestErr(`${Object.values(err).map((error) => error).join(", ")}`));
@@ -90,7 +90,7 @@ exports.updateProfile = async (req, res, next) => {
       },
     );
     if (updateUser) {
-      return res.status(STATUS_ACCEPTED).send({ data: updateUser });
+      return res.status(STATUS_ACCEPTED).send(updateUser);
     }
     throw new NotFoundErr("Данный пользователь не найден");
   } catch (err) {
@@ -113,7 +113,7 @@ exports.updateAvatar = async (req, res, next) => {
       },
     );
     if (updateAvatar) {
-      return res.status(STATUS_OK).send({ data: updateAvatar });
+      return res.status(STATUS_OK).send(updateAvatar);
     }
     throw new NotFoundErr("Данный пользователь не найден");
   } catch (err) {

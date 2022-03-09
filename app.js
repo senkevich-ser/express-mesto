@@ -8,11 +8,20 @@ const auth = require("./middlewares/auth");
 const { ERROR_SERVER } = require("./utils/constants");
 const NotFoundErr = require("./errors/NotFoundErr");
 const { checkUser } = require('./utils/validation');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 app.use(express.json());
+
+app.use(requestLogger);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post("/signup", checkUser, createUser);
 app.post("/signin", checkUser, userLogin);
@@ -21,6 +30,8 @@ app.use("/cards", auth, cardRoutes);
 app.use(auth, () => {
   throw new NotFoundErr('Запрашиваемый ресурс не найден');
 });
+
+app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
